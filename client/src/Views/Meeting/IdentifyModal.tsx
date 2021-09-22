@@ -110,18 +110,59 @@ export function IdentifyModal() {
     );
   };
 
+  const [name, setName] = useState<string>('');
+
   return (
     <div>
       <header
         style={{
           position: 'relative',
+
           zIndex: 3,
           backgroundColor: 'white',
           opacity: 1,
         }}>
-        <button type="submit" onClick={handleClientLoad}>
-          Log in
-        </button>
+        <form
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <h1 style={{textAlign: 'center'}}>Meeting Title Here</h1>
+          <label style={{textAlign: 'center'}}>Import your availability</label>
+          <button
+            style={{textAlign: 'center'}}
+            type="submit"
+            onClick={handleClientLoad}>
+            Sync your calendar with Google
+          </button>
+          <div
+            style={{
+              width: '615px',
+              height: '0px',
+              left: '412px',
+              top: '478px',
+
+              border: '1px solid #000000',
+            }}></div>
+          <label style={{textAlign: 'center'}} htmlFor="name">
+            Or
+          </label>
+          <input
+            style={{marginLeft: 'auto', marginRight: 'auto'}}
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={'Tell us what to call you'}
+          />
+          <button
+            style={{marginLeft: 'auto', marginRight: 'auto'}}
+            type="submit"
+            onClick={() => {}}>
+            Manually add my availability
+          </button>
+        </form>
       </header>
       <div
         style={{
