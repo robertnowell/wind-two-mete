@@ -57,7 +57,7 @@ const DayCell = ({
     if (!selected) {
       setScheduleDays([
         ...scheduleDays,
-        { start: date, end: add(date, { hours: 24 }) },
+        { start: date.getTime(), end: add(date, { hours: 24 }).getTime() },
       ]);
     } else {
       setScheduleDays(
@@ -78,6 +78,9 @@ const DayCell = ({
         border: selected ? "solid 3px var(--color)" : "solid 3px transparent",
         borderRadius: "5px",
         margin: "3px",
+        cursor: "pointer",
+        color: selected ? "white" : "black",
+        backgroundColor: selected ? "var(--color)" : "transparent",
       }}
     >
       {getDate(date)}
