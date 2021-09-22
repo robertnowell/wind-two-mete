@@ -3,7 +3,7 @@ import "./App.css";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { initializeApp } from "firebase/app";
 
-import { Meeting, CreateMeeting } from "./Views";
+import { MeetingView, CreateMeeting } from "./Views";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBQMtR069j8LpyGTwU3JnfCwPyrnMoDoiU",
@@ -33,10 +33,10 @@ function App() {
         <div>
           <Switch>
             <Route path="/m/:id">
-              <Meeting />
+              <MeetingView />
             </Route>
             <Route path="/m">
-              <Meeting />
+              <MeetingView />
             </Route>
             <Route exact path="/">
               <CreateMeeting />

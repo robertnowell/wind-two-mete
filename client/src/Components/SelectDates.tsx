@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ScheduleDay } from "../Types";
 import { set, add, getDay, previousSunday, getDate, isSameDay } from "date-fns";
 const DEFAULT_END_OFFSET_HR = 24;
-
-const dow = ["S", "M", "T", "W", "T", "F", "S"];
+const RESOLUTION_HR = 2; //
 
 export function SelectDates({
   scheduleDays,
@@ -57,7 +56,12 @@ const DayCell = ({
     if (!selected) {
       setScheduleDays([
         ...scheduleDays,
-        { start: date.getTime(), end: add(date, { hours: 24 }).getTime() },
+        {
+          start: date.getTime(),
+          end: add(date, { hours: DEFAULT_END_OFFSET_HR }).getTime(),
+          parts: DEFAULT_END_OFFSET_HR * RESOLUTION_HR,
+          partSize: 1 / RESOLUTION_HR,
+        },
       ]);
     } else {
       setScheduleDays(

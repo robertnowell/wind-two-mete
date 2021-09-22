@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { ScheduleDay, Meeting } from "../../Types";
+import { ScheduleDay, Meeting, UnixTime } from "../../Types";
 import { SelectDates } from "../../Components";
 import { nanoid } from "nanoid";
 import { uniqueNamesGenerator, Config, animals } from "unique-names-generator";
@@ -46,7 +46,11 @@ export function CreateMeeting() {
           onChange={(e) => setName(e.target.value)}
           placeholder={randomAnimalMeetingName}
         />
-        <button type="submit" onClick={createMeeting}>
+        <button
+          disabled={dates.length < 1}
+          type="submit"
+          onClick={createMeeting}
+        >
           Create Meeting
         </button>
       </form>
