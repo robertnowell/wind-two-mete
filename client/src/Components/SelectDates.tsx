@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ScheduleDay } from "../Types";
 import { set, add, getDay, previousSunday, getDate, isSameDay } from "date-fns";
 const DEFAULT_END_OFFSET_HR = 24;
@@ -19,6 +19,8 @@ export function SelectDates({
 
   const rows = getDay(today) === 0 ? 2 : 3;
 
+  useEffect(() => {}, []);
+
   return (
     <div>
       {Array.from(Array(rows).keys()).map((row) => {
@@ -30,6 +32,7 @@ export function SelectDates({
                   scheduleDays={scheduleDays}
                   setScheduleDays={setScheduleDays}
                   date={add(lastSunday, { days: dow + 7 * row })}
+                  disabled={add(lastSunday, { days: dow + 7 * row }) < today}
                 />
               );
             })}
@@ -44,7 +47,9 @@ const DayCell = ({
   date,
   scheduleDays,
   setScheduleDays,
+  disabled,
 }: {
+  disabled: boolean;
   date: Date;
   scheduleDays: ScheduleDay[];
   setScheduleDays: (d: ScheduleDay[]) => void;
@@ -53,6 +58,10 @@ const DayCell = ({
     scheduleDays.find(({ start }) => isSameDay(date, start)) !== undefined;
 
   const onClick = () => {
+    if (disabled) {
+      return;
+    }
+
     if (!selected) {
       setScheduleDays([
         ...scheduleDays,
@@ -87,7 +96,7 @@ const DayCell = ({
         backgroundColor: selected ? "var(--color)" : "transparent",
       }}
     >
-      {getDate(date)}
+      {!disabled && getDate(date)}
     </div>
   );
 };
