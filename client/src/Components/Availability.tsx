@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Meeting, ScheduleDay, UnixTime, UserRecord } from "../Types";
+import { Meeting, ScheduleDay, UnixTime } from "../Types";
 import { getDate, getDay, sub, add, format } from "date-fns";
-import { getDatabase, ref, set } from "firebase/database";
-import { nanoid } from "nanoid";
 const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sun"];
-
-const userID = nanoid(11);
 
 const buildAvailabilityDataStructure = (scheduleDays: ScheduleDay[]) => {
   const x = scheduleDays.reduce<Record<UnixTime, string[][]>>(
@@ -37,9 +33,11 @@ const mergeGroupCalendar = (meeting: Meeting) => {
 export function Availability({
   meeting,
   name,
+  submitTimes,
 }: {
   meeting: Meeting;
   name: string;
+  submitTimes: (a: Record<UnixTime, boolean[]>) => void;
 }) {
   const [mouseDown, setMouseDown] = useState(false);
 
@@ -62,15 +60,9 @@ export function Availability({
     setAvailability({ ...availability });
   };
 
-  const submitTimes = async (e: React.MouseEvent<HTMLElement>) => {
+  const onSubmit = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
-    const db = getDatabase();
-    const user: UserRecord = {
-      id: userID,
-      name: name,
-      windows: availability,
-    };
-    await set(ref(db, "meetings/" + meeting.id + "/users/" + user.id), user);
+    submitTimes(availability);
   };
 
   useEffect(() => {
@@ -98,7 +90,7 @@ export function Availability({
           />
         ))}
       </div>
-      <button type="submit" onClick={submitTimes}>
+      <button type="submit" onClick={onSubmit}>
         Save Times
       </button>
     </form>
