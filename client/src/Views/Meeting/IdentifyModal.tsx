@@ -5,7 +5,15 @@ declare global {
   }
 }
 
-export function IdentifyModal() {
+export function IdentifyModal({
+  setModalOpen,
+  setName,
+  name,
+}: {
+  setModalOpen: (state: boolean) => void;
+  setName: (name: string) => void;
+  name: string;
+}) {
   const CLIENT_ID =
     "59554851138-objj75qdgbinjf47pit1rh57ebpkf7vt.apps.googleusercontent.com";
   const API_KEY = "AIzaSyCcJ2q-DhpLdjZH1URnzZLU9Jmna36SNog";
@@ -29,7 +37,8 @@ export function IdentifyModal() {
     console.log("events: ", events);
   }, [events]);
 
-  const handleClientLoad = () => {
+  const handleClientLoad = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
     window.gapi.load("client:auth2", initClient);
   };
 
@@ -109,8 +118,6 @@ export function IdentifyModal() {
       })
     );
   };
-
-  const [name, setName] = useState<string>("");
 
   return (
     <div>

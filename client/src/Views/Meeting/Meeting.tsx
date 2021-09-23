@@ -12,6 +12,7 @@ export function MeetingView() {
   const [modalOpen, setModalOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
+  const [name, setName] = useState("");
 
   useEffect(() => {
     //Check if meeting exists
@@ -55,7 +56,13 @@ export function MeetingView() {
 
   return (
     <main>
-      {/* <IdentifyModal /> */}
+      {modalOpen && (
+        <IdentifyModal
+          name={name}
+          setName={setName}
+          setModalOpen={setModalOpen}
+        />
+      )}
       <h2>{meeting.name}</h2>
       <input onChange={() => {}} value={`${window.location.host}/m/${id}`} />
       <button>Copy</button>
