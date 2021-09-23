@@ -151,6 +151,7 @@ const DayColumn = React.memo(
 
             return (
               <div
+                key={i}
                 style={{
                   width: "90px",
                   height: "30px",
@@ -163,7 +164,7 @@ const DayColumn = React.memo(
                     backgroundColor: "#7944E1",
                     border: "5px solid #7944E1",
                     position: "absolute",
-                    opacity: (1 / userCount) * availCount,
+                    opacity: userCount ? (1 / userCount) * availCount : 0,
                   }}
                 ></div>
                 <div
@@ -209,9 +210,8 @@ const CalendarKey = ({ scheduleDay }: { scheduleDay: ScheduleDay }) => {
         .fill(0)
         .map((_, i) => {
           return (
-            <div style={{ display: "flex", justifyContent: "end" }}>
+            <div key={i} style={{ display: "flex", justifyContent: "end" }}>
               <div
-                key={i}
                 style={{
                   width: i % TICK_FREQUENCY === 0 ? "90px" : "10px",
                   height: "29px",

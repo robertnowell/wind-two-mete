@@ -23,12 +23,13 @@ export function SelectDates({
 
   return (
     <div>
-      {Array.from(Array(rows).keys()).map((row) => {
+      {Array.from(Array(rows).keys()).map((row, i) => {
         return (
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex" }} key={i}>
             {Array.from(Array(7).keys()).map((dow) => {
               return (
                 <DayCell
+                  key={dow}
                   scheduleDays={scheduleDays}
                   setScheduleDays={setScheduleDays}
                   date={add(lastSunday, { days: dow + 7 * row })}

@@ -5,8 +5,6 @@ import { Availability } from "../../Components";
 import { Meeting } from "../../Types";
 import { getDatabase, ref, child, get } from "firebase/database";
 
-const STORAGE_KEY = "WIND_TO_MEET";
-
 export function MeetingView() {
   const { id } = useParams<{ id: string }>();
   const [modalOpen, setModalOpen] = useState(true);
@@ -58,6 +56,7 @@ export function MeetingView() {
     <main>
       {modalOpen && (
         <IdentifyModal
+          meeting={meeting}
           name={name}
           setName={setName}
           setModalOpen={setModalOpen}
@@ -67,7 +66,7 @@ export function MeetingView() {
       <input onChange={() => {}} value={`${window.location.host}/m/${id}`} />
       <button>Copy</button>
       <hr />
-      <Availability name="Caleb" meeting={meeting} />
+      <Availability name={name} meeting={meeting} />
     </main>
   );
 }

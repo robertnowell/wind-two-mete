@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Meeting } from "../../Types";
 declare global {
   interface Window {
     gapi: any;
@@ -9,11 +10,17 @@ export function IdentifyModal({
   setModalOpen,
   setName,
   name,
+  setSchedule,
+  meeting,
 }: {
   setModalOpen: (state: boolean) => void;
   setName: (name: string) => void;
   name: string;
+  setSchedule?: () => void;
+  meeting: Meeting;
 }) {
+  const [error, setError] = useState("");
+
   const CLIENT_ID =
     "59554851138-objj75qdgbinjf47pit1rh57ebpkf7vt.apps.googleusercontent.com";
   const API_KEY = "AIzaSyCcJ2q-DhpLdjZH1URnzZLU9Jmna36SNog";
@@ -62,7 +69,7 @@ export function IdentifyModal({
       openSignInPopup();
     } else {
       // Get events if access token is found without sign in popup
-      console.log("also here");
+      // TODO set bounds based on Meeting.
       fetch(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events?key=${API_KEY}&orderBy=startTime&singleEvents=true`,
         {
@@ -106,6 +113,9 @@ export function IdentifyModal({
   };
 
   const formatEvents = (list: any[]) => {
+    // Filter for status of event. Looks like they can be tentative, confirmed or cancelled.
+    // TODO how to handle all day events. Need to grab timezone as well.
+
     return list.map(
       (item: {
         summary: any;
@@ -117,6 +127,15 @@ export function IdentifyModal({
         end: item.end.dateTime || item.end.date,
       })
     );
+  };
+
+  const manuallyAdd = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    if (!name) {
+      setError("Please tell us your name :)");
+      return;
+    }
+    setModalOpen(false);
   };
 
   return (
@@ -172,10 +191,11 @@ export function IdentifyModal({
           <button
             style={{ marginLeft: "auto", marginRight: "auto" }}
             type="submit"
-            onClick={() => {}}
+            onClick={manuallyAdd}
           >
             Manually add my availability
           </button>
+          {error}
         </form>
       </header>
       <div
