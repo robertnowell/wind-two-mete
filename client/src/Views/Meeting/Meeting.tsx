@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { IdentifyModal } from "./IdentifyModal";
 import { Availability } from "../../Components";
-import { Meeting, UserRecord } from "../../Types";
+import { Meeting, UserRecord, GoogleEventFormat, UnixTime } from "../../Types";
 import { getDatabase, ref, child, get, set } from "firebase/database";
 import { nanoid } from "nanoid";
 
@@ -18,20 +18,31 @@ export function MeetingView() {
   const [userId, setUserId] = useState<string>(nanoid());
   const urlInputRef = useRef<HTMLInputElement>(null);
 
-  const loadMeeting = () => {
+  const [availability, setAvailability] = useState<Record<UnixTime, boolean[]>>(
+    {}
+  );
+
+  const loadMeeting = async () => {
     const dbRef = ref(getDatabase());
-    get(child(dbRef, `meetings/${id}`))
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          setMeeting(snapshot.val());
-        } else {
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const snapshot = await get(child(dbRef, `meetings/${id}`));
+
+    if (snapshot.exists()) {
+      const loadedMeeting: Meeting = snapshot.val();
+      setMeeting(loadedMeeting);
+
+      const startValue = loadedMeeting.scheduleDays.reduce<
+        Record<UnixTime, boolean[]>
+      >((prevValue, currentValue) => {
+        prevValue[currentValue.start] = Array(currentValue.parts).fill(false);
+        return prevValue;
+      }, {});
+      setAvailability(startValue);
+    }
+
+    setLoading(false);
   };
+
+  const setScheduleFromGoogle = (eventList: GoogleEventFormat[]) => {};
 
   useEffect(() => {
     //Check if meeting exists
@@ -106,6 +117,7 @@ export function MeetingView() {
           name={name}
           setName={setName}
           setModalOpen={setModalOpen}
+          setSchedule={setScheduleFromGoogle}
         />
       )}
       <h2>{meeting.name}</h2>
@@ -130,7 +142,13 @@ export function MeetingView() {
             .join(", ")}
         </p>
       )}
-      <Availability name={name} meeting={meeting} submitTimes={submitTimes} />
+      <Availability
+        availability={availability}
+        setAvailability={setAvailability}
+        name={name}
+        meeting={meeting}
+        submitTimes={submitTimes}
+      />
     </main>
   );
 }

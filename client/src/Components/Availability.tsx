@@ -34,26 +34,18 @@ export function Availability({
   meeting,
   name,
   submitTimes,
+  availability,
+  setAvailability,
 }: {
   meeting: Meeting;
   name: string;
   submitTimes: (a: Record<UnixTime, boolean[]>) => void;
+  availability: Record<UnixTime, boolean[]>;
+  setAvailability: (a: Record<UnixTime, boolean[]>) => void;
 }) {
   const [mouseDown, setMouseDown] = useState(false);
 
   const groupSchedule = mergeGroupCalendar(meeting);
-
-  const [availability, setAvailability] = useState<Record<UnixTime, boolean[]>>(
-    () => {
-      const startValue = meeting.scheduleDays.reduce<
-        Record<UnixTime, boolean[]>
-      >((prevValue, currentValue) => {
-        prevValue[currentValue.start] = Array(currentValue.parts).fill(false);
-        return prevValue;
-      }, {});
-      return startValue;
-    }
-  );
 
   const updateAvailability = (startDate: number, section: number) => {
     availability[startDate][section] = !availability[startDate][section];

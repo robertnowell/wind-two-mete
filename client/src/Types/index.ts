@@ -19,3 +19,9 @@ export type UserRecord = {
   name: string;
   id: string;
 };
+export type GoogleEventFormat = {
+  title: string;
+  start: Date;
+  end: Date;
+  timeZone: string;
+};
