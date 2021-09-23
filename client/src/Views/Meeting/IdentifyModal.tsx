@@ -139,7 +139,7 @@ export function IdentifyModal({
   };
 
   return (
-    <div>
+    <div style={{ position: "fixed", zIndex: 3 }}>
       <header
         style={{
           position: "relative",

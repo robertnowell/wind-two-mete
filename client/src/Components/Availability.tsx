@@ -192,7 +192,7 @@ const DayColumn = React.memo(
   }
 );
 
-const TICK_FREQUENCY = 3;
+const TICK_FREQUENCY = 2;
 
 const CalendarKey = ({ scheduleDay }: { scheduleDay: ScheduleDay }) => {
   return (

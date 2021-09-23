@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { IdentifyModal } from "./IdentifyModal";
 import { Availability } from "../../Components";
@@ -14,8 +14,9 @@ export function MeetingView() {
   const [modalOpen, setModalOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(localStorage.getItem(USER_NAME_KEY) || "");
   const [userId, setUserId] = useState<string>(nanoid());
+  const urlInputRef = useRef<HTMLInputElement>(null);
 
   const loadMeeting = () => {
     const dbRef = ref(getDatabase());
@@ -95,6 +96,8 @@ export function MeetingView() {
     );
   }
 
+  const url = `${window.location.host}/m/${id}`;
+
   return (
     <main>
       {modalOpen && (
@@ -109,9 +112,24 @@ export function MeetingView() {
       <p>
         Editing availability for <b>{name}</b>
       </p>
-      <input onChange={() => {}} value={`${window.location.host}/m/${id}`} />
-      <button>Copy</button>
+
+      <input ref={urlInputRef} onChange={() => {}} value={url} />
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(url);
+        }}
+      >
+        Copy
+      </button>
       <hr />
+      {meeting.users && (
+        <p>
+          We have responses from{" "}
+          {Object.values(meeting.users)
+            .map((user) => user.name)
+            .join(", ")}
+        </p>
+      )}
       <Availability name={name} meeting={meeting} submitTimes={submitTimes} />
     </main>
   );
