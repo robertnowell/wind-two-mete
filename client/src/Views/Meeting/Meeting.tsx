@@ -55,12 +55,12 @@ export function MeetingView() {
 
   return (
     <main>
+      {/* <IdentifyModal /> */}
       <h2>{meeting.name}</h2>
       <input onChange={() => {}} value={`${window.location.host}/m/${id}`} />
       <button>Copy</button>
       <hr />
       <Availability name="Caleb" meeting={meeting} />
-      {/* <IdentifyModal /> */}
     </main>
   );
 }

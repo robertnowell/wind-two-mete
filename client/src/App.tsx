@@ -28,23 +28,19 @@ initializeApp(firebaseConfig);
 
 function App() {
   return (
-    <main>
-      <Router>
-        <div>
-          <Switch>
-            <Route path="/m/:id">
-              <MeetingView />
-            </Route>
-            <Route path="/m">
-              <MeetingView />
-            </Route>
-            <Route exact path="/">
-              <CreateMeeting />
-            </Route>
-          </Switch>
-        </div>
-      </Router>
-    </main>
+    <Router>
+      <Switch>
+        <Route path="/m/:id">
+          <MeetingView />
+        </Route>
+        <Route path="/m">
+          <MeetingView />
+        </Route>
+        <Route exact path="/">
+          <CreateMeeting />
+        </Route>
+      </Switch>
+    </Router>
   );
 }
 

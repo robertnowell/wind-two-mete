@@ -11,7 +11,7 @@ export type Meeting = {
   id: string;
   name: string;
   scheduleDays: ScheduleDay[];
-  users: Record<string, UserRecord>;
+  users?: Record<string, UserRecord>;
 };
 
 export type UserRecord = {

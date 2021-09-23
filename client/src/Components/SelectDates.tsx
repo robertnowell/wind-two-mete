@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ScheduleDay } from "../Types";
 import { set, add, getDay, previousSunday, getDate, isSameDay } from "date-fns";
 const DEFAULT_END_OFFSET_HR = 24;

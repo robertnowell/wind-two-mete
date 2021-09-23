@@ -31,7 +31,6 @@ const mergeGroupCalendar = (meeting: Meeting) => {
       });
     });
   });
-  console.log(groupSchedule);
   return groupSchedule;
 };
 
@@ -89,7 +88,7 @@ export function Availability({
         <CalendarKey scheduleDay={meeting.scheduleDays[0]} />
         {meeting.scheduleDays.map((scheduleDay, i) => (
           <DayColumn
-            userCount={Object.keys(meeting.users).length}
+            userCount={Object.keys(meeting.users || {}).length}
             groupSchedule={groupSchedule}
             mouseDown={mouseDown}
             key={scheduleDay.start}
@@ -124,12 +123,13 @@ const DayColumn = React.memo(
   }) => {
     return (
       <div>
-        <h2>{dow[getDay(scheduleDay.start)]}</h2>
-        {getDate(scheduleDay.start)}
-        {getDate(scheduleDay.start) !==
-        getDate(sub(scheduleDay.end, { seconds: 1 }))
-          ? "/" + getDate(scheduleDay.end)
-          : ""}
+        <h2>
+          {dow[getDay(scheduleDay.start)]} {getDate(scheduleDay.start)}
+          {getDate(scheduleDay.start) !==
+          getDate(sub(scheduleDay.end, { seconds: 1 }))
+            ? "/" + getDate(scheduleDay.end)
+            : ""}
+        </h2>
         {Array(scheduleDay.parts)
           .fill(0)
           .map((_, i) => {
@@ -151,31 +151,46 @@ const DayColumn = React.memo(
 
             return (
               <div
-                key={i}
-                onMouseDown={() => {
-                  updateAvailability(scheduleDay.start, i);
-                }}
-                onMouseOver={() => {
-                  if (mouseDown) {
-                    updateAvailability(scheduleDay.start, i);
-                  }
-                }}
                 style={{
-                  width: "80px",
-                  height: "20px",
-                  border: "5px solid transparent",
-                  borderRightColor: selected ? "#6DC266" : "transparent",
-                  borderLeftColor: selected ? "#6DC266" : "transparent",
-                  borderTopColor:
-                    selected && !lastSelected ? "#6DC266" : "transparent",
-                  borderBottomColor:
-                    selected && !nextSelected ? "#6DC266" : "transparent",
-                  backgroundColor: "#7944E1",
-                  opacity: (1 / userCount) * availCount,
-                  userSelect: "none",
+                  width: "90px",
+                  height: "30px",
                 }}
               >
-                {availCount}
+                <div
+                  style={{
+                    width: "80px",
+                    height: "20px",
+                    backgroundColor: "#7944E1",
+                    border: "5px solid #7944E1",
+                    position: "absolute",
+                    opacity: (1 / userCount) * availCount,
+                  }}
+                ></div>
+                <div
+                  key={i}
+                  onMouseDown={() => {
+                    updateAvailability(scheduleDay.start, i);
+                  }}
+                  onMouseOver={() => {
+                    if (mouseDown) {
+                      updateAvailability(scheduleDay.start, i);
+                    }
+                  }}
+                  style={{
+                    width: "80px",
+                    height: "20px",
+                    border: "5px solid transparent",
+                    borderRightColor: selected ? "#6DC266" : "transparent",
+                    borderLeftColor: selected ? "#6DC266" : "transparent",
+                    borderTopColor:
+                      selected && !lastSelected ? "#6DC266" : "transparent",
+                    borderBottomColor:
+                      selected && !nextSelected ? "#6DC266" : "transparent",
+                    userSelect: "none",
+                    position: "absolute",
+                    borderRadius: "3px",
+                  }}
+                ></div>
               </div>
             );
           })}
@@ -184,33 +199,39 @@ const DayColumn = React.memo(
   }
 );
 
+const TICK_FREQUENCY = 3;
+
 const CalendarKey = ({ scheduleDay }: { scheduleDay: ScheduleDay }) => {
   return (
     <div>
-      <h2>&#x200B;</h2>&#x200B;
+      <h2>&#x200B;</h2>
       {Array(scheduleDay.parts)
         .fill(0)
         .map((_, i) => {
           return (
-            <div
-              key={i}
-              style={{
-                width: "90px",
-                height: "20px",
-
-                borderBottom:
-                  i % 6 === 0 ? "1px solid black" : "1px solid transparent",
-                borderTop: "1px solid transparent",
-              }}
-            >
-              {i % 6 === 0 && (
-                <small>
-                  {format(
-                    add(scheduleDay.start, { hours: i * scheduleDay.partSize }),
-                    "h aaa"
-                  )}
-                </small>
-              )}
+            <div style={{ display: "flex", justifyContent: "end" }}>
+              <div
+                key={i}
+                style={{
+                  width: i % TICK_FREQUENCY === 0 ? "90px" : "10px",
+                  height: "29px",
+                  borderTop:
+                    i % TICK_FREQUENCY === 0
+                      ? "1px solid black"
+                      : "1px solid grey",
+                }}
+              >
+                {i % TICK_FREQUENCY === 0 && (
+                  <small>
+                    {format(
+                      add(scheduleDay.start, {
+                        hours: i * scheduleDay.partSize,
+                      }),
+                      "h aaa"
+                    )}
+                  </small>
+                )}
+              </div>
             </div>
           );
         })}
