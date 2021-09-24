@@ -7,7 +7,6 @@ import { IdentifyModal } from "./IdentifyModal";
 import { Availability } from "../../Components";
 import { Meeting, UserRecord, GoogleEventFormat, UnixTime } from "../../Types";
 
-const USER_ID_KEY = "USER_ID_KEY";
 const USER_NAME_KEY = "USER_NAME_KEY";
 
 export function MeetingView() {
@@ -16,7 +15,7 @@ export function MeetingView() {
   const [loading, setLoading] = useState(true);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
   const [name, setName] = useState(localStorage.getItem(USER_NAME_KEY) || "");
-  const [userId, setUserId] = useState<string>(nanoid());
+  const [userId] = useState<string>(nanoid());
   const urlInputRef = useRef<HTMLInputElement>(null);
 
   const [availability, setAvailability] = useState<Record<UnixTime, boolean[]>>(

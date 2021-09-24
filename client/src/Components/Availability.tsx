@@ -114,71 +114,73 @@ const DayColumn = React.memo(
             ? "/" + getDate(scheduleDay.end)
             : ""}
         </h2>
-        {Array(scheduleDay.parts)
-          .fill(0)
-          .map((_, i) => {
-            const availCount =
-              groupSchedule[scheduleDay.start] &&
-              groupSchedule[scheduleDay.start][i].length;
+        <div style={{}}>
+          {Array(scheduleDay.parts)
+            .fill(0)
+            .map((_, i) => {
+              const availCount =
+                groupSchedule[scheduleDay.start] &&
+                groupSchedule[scheduleDay.start][i].length;
 
-            const selected =
-              availability[scheduleDay.start] &&
-              availability[scheduleDay.start][i];
+              const selected =
+                availability[scheduleDay.start] &&
+                availability[scheduleDay.start][i];
 
-            const lastSelected =
-              availability[scheduleDay.start] &&
-              availability[scheduleDay.start][i - 1];
+              const lastSelected =
+                availability[scheduleDay.start] &&
+                availability[scheduleDay.start][i - 1];
 
-            const nextSelected =
-              availability[scheduleDay.start] &&
-              availability[scheduleDay.start][i + 1];
+              const nextSelected =
+                availability[scheduleDay.start] &&
+                availability[scheduleDay.start][i + 1];
 
-            return (
-              <div
-                key={i}
-                style={{
-                  width: "90px",
-                  height: "30px",
-                }}
-              >
-                <div
-                  style={{
-                    width: "80px",
-                    height: "20px",
-                    backgroundColor: "#7944E1",
-                    border: "5px solid #7944E1",
-                    position: "absolute",
-                    opacity: userCount ? (1 / userCount) * availCount : 0,
-                  }}
-                ></div>
+              return (
                 <div
                   key={i}
-                  onMouseDown={() => {
-                    updateAvailability(scheduleDay.start, i);
-                  }}
-                  onMouseOver={() => {
-                    if (mouseDown) {
-                      updateAvailability(scheduleDay.start, i);
-                    }
-                  }}
                   style={{
-                    width: "80px",
-                    height: "20px",
-                    border: "5px solid transparent",
-                    borderRightColor: selected ? "#6DC266" : "transparent",
-                    borderLeftColor: selected ? "#6DC266" : "transparent",
-                    borderTopColor:
-                      selected && !lastSelected ? "#6DC266" : "transparent",
-                    borderBottomColor:
-                      selected && !nextSelected ? "#6DC266" : "transparent",
-                    userSelect: "none",
-                    position: "absolute",
-                    borderRadius: "3px",
+                    width: "90px",
+                    height: "30px",
                   }}
-                ></div>
-              </div>
-            );
-          })}
+                >
+                  <div
+                    style={{
+                      width: "80px",
+                      height: "20px",
+                      backgroundColor: "#7944E1",
+                      border: "5px solid #7944E1",
+                      position: "absolute",
+                      opacity: userCount ? (1 / userCount) * availCount : 0,
+                    }}
+                  ></div>
+                  <div
+                    key={i}
+                    onMouseDown={() => {
+                      updateAvailability(scheduleDay.start, i);
+                    }}
+                    onMouseOver={() => {
+                      if (mouseDown) {
+                        updateAvailability(scheduleDay.start, i);
+                      }
+                    }}
+                    style={{
+                      width: "80px",
+                      height: "20px",
+                      border: "5px solid transparent",
+                      borderRightColor: selected ? "#6DC266" : "transparent",
+                      borderLeftColor: selected ? "#6DC266" : "transparent",
+                      borderTopColor:
+                        selected && !lastSelected ? "#6DC266" : "transparent",
+                      borderBottomColor:
+                        selected && !nextSelected ? "#6DC266" : "transparent",
+                      userSelect: "none",
+                      position: "absolute",
+                      borderRadius: "3px",
+                    }}
+                  ></div>
+                </div>
+              );
+            })}
+        </div>
       </div>
     );
   }
