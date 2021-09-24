@@ -101,8 +101,8 @@ export function IdentifyModal({
         end: { dateTime: any; date: any };
       }) => ({
         title: item.summary,
-        start: item.start.dateTime,
-        end: item.end.dateTime,
+        start: new Date(item.start.dateTime),
+        end: new Date(item.end.dateTime),
         timeZone: item.start.timeZone,
       })
     );

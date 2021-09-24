@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
+import { getDatabase, ref, child, get, set } from "firebase/database";
+import { nanoid } from "nanoid";
+import { add } from "date-fns";
 import { IdentifyModal } from "./IdentifyModal";
 import { Availability } from "../../Components";
 import { Meeting, UserRecord, GoogleEventFormat, UnixTime } from "../../Types";
-import { getDatabase, ref, child, get, set } from "firebase/database";
-import { nanoid } from "nanoid";
 
 const USER_ID_KEY = "USER_ID_KEY";
 const USER_NAME_KEY = "USER_NAME_KEY";
@@ -42,7 +43,67 @@ export function MeetingView() {
     setLoading(false);
   };
 
-  const setScheduleFromGoogle = (eventList: GoogleEventFormat[]) => {};
+  const setScheduleFromGoogle = (eventList: GoogleEventFormat[]) => {
+    if (!meeting) {
+      return;
+    }
+
+    const emptySchedule = meeting.scheduleDays.reduce<
+      Record<UnixTime, boolean[]>
+    >((prevValue, currentValue) => {
+      prevValue[currentValue.start] = Array(currentValue.parts).fill(true);
+      return prevValue;
+    }, {});
+
+    eventList.forEach((event) => {
+      blockOutTimes(emptySchedule, event.start, event.end);
+    });
+
+    setAvailability(emptySchedule);
+  };
+
+  const blockOutTimes = (
+    schedule: Record<number, boolean[]>,
+    start: Date,
+    end: Date
+  ) => {
+    if (!meeting) {
+      return;
+    }
+
+    const datesToEdit = Object.keys(schedule).filter((key) => {
+      const unixTime = +key;
+      return (
+        unixTime <= start.getTime() &&
+        start.getTime() <
+          add(unixTime, {
+            minutes: schedule[unixTime].length * 0.5 * 60,
+          }).getTime()
+      );
+    });
+
+    datesToEdit.forEach((timeKey) => {
+      let dateStartTime = +timeKey;
+      let block = 0;
+      const resolution = meeting?.scheduleDays[0].partSize || 0.5;
+      while (block <= schedule[dateStartTime].length) {
+        // if block block in between start and end. Block off
+
+        const blockStartTime = add(dateStartTime, {
+          minutes: block * resolution * 60,
+        }).getTime();
+
+        if (blockStartTime > end.getTime()) {
+          break;
+        }
+
+        if (blockStartTime >= start.getTime()) {
+          schedule[dateStartTime][block] = false;
+        }
+        block++;
+      }
+    });
+  };
 
   useEffect(() => {
     //Check if meeting exists
