@@ -47,7 +47,7 @@ export function CreateMeeting() {
           placeholder={randomAnimalMeetingName}
         />
         <button
-          disabled={dates.length < 1}
+          disabled={dates.length < 1 || dates.length > 8}
           type="submit"
           onClick={createMeeting}
         >

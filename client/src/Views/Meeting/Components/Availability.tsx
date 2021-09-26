@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Meeting, ScheduleDay, UnixTime } from "../../../Types";
 import { getDate, getDay, sub, add, format } from "date-fns";
 import { Key } from "./Key";
+import { CellAvailability } from "./CellAvailability";
 const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sun"];
 
 const buildAvailabilityDataStructure = (scheduleDays: ScheduleDay[]) => {
@@ -46,6 +47,10 @@ export function Availability({
 }) {
   const [mouseDown, setMouseDown] = useState(false);
   const [dragStartState, setDragStartState] = useState(false);
+  const [hoverCell, setHoverCell] = useState<{
+    startDate: number;
+    section: number;
+  } | null>(null);
 
   const groupSchedule = mergeGroupCalendar(meeting);
 
@@ -74,28 +79,45 @@ export function Availability({
   }, []);
 
   return (
-    <form>
-      <Key />
-      <div style={{ display: "flex" }}>
-        <CalendarKey scheduleDay={meeting.scheduleDays[0]} />
-        {meeting.scheduleDays.map((scheduleDay, i) => (
-          <DayColumn
-            setDragStartState={setDragStartState}
-            dragStartState={dragStartState}
-            userCount={Object.keys(meeting.users || {}).length}
-            groupSchedule={groupSchedule}
-            mouseDown={mouseDown}
-            key={scheduleDay.start}
-            scheduleDay={scheduleDay}
-            updateAvailability={updateAvailability}
-            availability={availability}
+    <div>
+      <form style={{ display: "flex" }}>
+        <div style={{ flex: 4 }}>
+          <Key />
+          <div style={{ display: "flex" }}>
+            <CalendarKey scheduleDay={meeting.scheduleDays[0]} />
+            {meeting.scheduleDays.map((scheduleDay, i) => (
+              <DayColumn
+                setDragStartState={setDragStartState}
+                dragStartState={dragStartState}
+                userCount={Object.keys(meeting.users || {}).length}
+                groupSchedule={groupSchedule}
+                mouseDown={mouseDown}
+                key={scheduleDay.start}
+                scheduleDay={scheduleDay}
+                updateAvailability={updateAvailability}
+                availability={availability}
+                setHoverCell={setHoverCell}
+                hoverCell={hoverCell}
+              />
+            ))}
+          </div>
+          <button type="submit" onClick={onSubmit}>
+            Save Times
+          </button>
+        </div>
+        <form style={{ height: "150px" }}>
+          <CellAvailability
+            allNames={Object.values(meeting.users || {}).map(
+              (user) => user.name
+            )}
+            names={
+              hoverCell &&
+              groupSchedule[hoverCell?.startDate][hoverCell?.section]
+            }
           />
-        ))}
-      </div>
-      <button type="submit" onClick={onSubmit}>
-        Save Times
-      </button>
-    </form>
+        </form>
+      </form>
+    </div>
   );
 }
 
@@ -112,11 +134,15 @@ const DayColumn = React.memo(
     userCount,
     setDragStartState,
     dragStartState,
+    setHoverCell,
+    hoverCell,
   }: {
     setDragStartState: (b: boolean) => void;
     dragStartState: boolean;
     scheduleDay: ScheduleDay;
     userCount: number;
+    setHoverCell: (cell: { startDate: number; section: number } | null) => void;
+    hoverCell: { startDate: number; section: number } | null;
     updateAvailability: (
       startDate: number,
       section: number,
@@ -146,6 +172,10 @@ const DayColumn = React.memo(
                 availability[scheduleDay.start] &&
                 availability[scheduleDay.start][i];
 
+              const hovered =
+                hoverCell?.startDate === scheduleDay.start &&
+                i === hoverCell.section;
+
               const lastSelected =
                 availability[scheduleDay.start] &&
                 availability[scheduleDay.start][i - 1];
@@ -167,9 +197,13 @@ const DayColumn = React.memo(
                     setDragStartState(selected);
                   }}
                   onMouseEnter={() => {
+                    setHoverCell({ startDate: scheduleDay.start, section: i });
                     if (mouseDown) {
                       updateAvailability(scheduleDay.start, i);
                     }
+                  }}
+                  onMouseLeave={() => {
+                    setHoverCell(null);
                   }}
                 >
                   <div
@@ -183,7 +217,6 @@ const DayColumn = React.memo(
                     }}
                   ></div>
                   <div
-                    key={i}
                     style={{
                       width: CELL_WIDTH,
                       height: CELL_HEIGHT,
@@ -194,6 +227,18 @@ const DayColumn = React.memo(
                       // borderRadius: "3px",
                     }}
                   ></div>
+                  {hovered && (
+                    <div
+                      style={{
+                        width: `calc(${CELL_WIDTH} - 4px`,
+                        height: `calc(${CELL_HEIGHT} - 4px`,
+                        userSelect: "none",
+                        position: "absolute",
+                        border: "solid 2px var(--color)",
+                        // borderRadius: "3px",
+                      }}
+                    ></div>
+                  )}
                 </div>
               );
             })}
