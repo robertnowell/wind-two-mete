@@ -118,14 +118,23 @@ export function IdentifyModal({
   };
 
   return (
-    <div style={{ position: "fixed", zIndex: 3 }}>
+    <div
+      style={{
+        position: "fixed",
+        zIndex: 3,
+        width: "100%",
+        top: "70px",
+        left: 0,
+      }}
+    >
       <header
         style={{
           position: "relative",
-
+          display: "flex",
+          justifyContent: "center",
           zIndex: 3,
-          backgroundColor: "white",
           opacity: 1,
+          width: "100%",
         }}
       >
         <form
@@ -134,6 +143,7 @@ export function IdentifyModal({
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
+            backgroundColor: "white",
           }}
         >
           <h1 style={{ textAlign: "center" }}>{meeting.name}</h1>
@@ -145,10 +155,10 @@ export function IdentifyModal({
           </button>
           <div
             style={{
-              width: "615px",
               height: "0px",
               left: "412px",
               top: "478px",
+              width: "800px",
 
               border: "1px solid #000000",
             }}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Meeting, ScheduleDay, UnixTime } from "../Types";
+import { Meeting, ScheduleDay, UnixTime } from "../../../Types";
 import { getDate, getDay, sub, add, format } from "date-fns";
 const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sun"];
 
@@ -44,11 +44,17 @@ export function Availability({
   setAvailability: (a: Record<UnixTime, boolean[]>) => void;
 }) {
   const [mouseDown, setMouseDown] = useState(false);
+  const [dragStartState, setDragStartState] = useState(false);
 
   const groupSchedule = mergeGroupCalendar(meeting);
 
-  const updateAvailability = (startDate: number, section: number) => {
-    availability[startDate][section] = !availability[startDate][section];
+  const updateAvailability = (
+    startDate: number,
+    section: number,
+    position?: boolean
+  ) => {
+    availability[startDate][section] =
+      position === undefined ? !availability[startDate][section] : position;
     setAvailability({ ...availability });
   };
 
@@ -72,6 +78,8 @@ export function Availability({
         <CalendarKey scheduleDay={meeting.scheduleDays[0]} />
         {meeting.scheduleDays.map((scheduleDay, i) => (
           <DayColumn
+            setDragStartState={setDragStartState}
+            dragStartState={dragStartState}
             userCount={Object.keys(meeting.users || {}).length}
             groupSchedule={groupSchedule}
             mouseDown={mouseDown}
@@ -89,6 +97,9 @@ export function Availability({
   );
 }
 
+const CELL_HEIGHT = "20px";
+const CELL_WIDTH = "60px";
+
 const DayColumn = React.memo(
   ({
     scheduleDay,
@@ -97,23 +108,30 @@ const DayColumn = React.memo(
     mouseDown,
     groupSchedule,
     userCount,
+    setDragStartState,
+    dragStartState,
   }: {
+    setDragStartState: (b: boolean) => void;
+    dragStartState: boolean;
     scheduleDay: ScheduleDay;
     userCount: number;
-    updateAvailability: (startDate: number, section: number) => void;
+    updateAvailability: (
+      startDate: number,
+      section: number,
+      position?: boolean
+    ) => void;
     availability: Record<UnixTime, boolean[]>;
     mouseDown: boolean;
     groupSchedule: Record<UnixTime, string[][]>;
   }) => {
     return (
       <div>
-        <h2>
-          {dow[getDay(scheduleDay.start)]} {getDate(scheduleDay.start)}
-          {getDate(scheduleDay.start) !==
-          getDate(sub(scheduleDay.end, { seconds: 1 }))
-            ? "/" + getDate(scheduleDay.end)
-            : ""}
-        </h2>
+        <h2>{dow[getDay(scheduleDay.start)]}</h2>
+        {getDate(scheduleDay.start)}
+        {getDate(scheduleDay.start) !==
+        getDate(sub(scheduleDay.end, { seconds: 1 }))
+          ? "/" + getDate(scheduleDay.end)
+          : ""}
         <div style={{}}>
           {Array(scheduleDay.parts)
             .fill(0)
@@ -138,43 +156,39 @@ const DayColumn = React.memo(
                 <div
                   key={i}
                   style={{
-                    width: "90px",
-                    height: "30px",
+                    width: CELL_WIDTH,
+                    height: CELL_HEIGHT,
+                    borderTop: "1px solid grey",
+                  }}
+                  onMouseDown={() => {
+                    updateAvailability(scheduleDay.start, i);
+                    setDragStartState(selected);
+                  }}
+                  onMouseOver={() => {
+                    if (mouseDown) {
+                      updateAvailability(scheduleDay.start, i);
+                    }
                   }}
                 >
                   <div
                     style={{
-                      width: "80px",
-                      height: "20px",
-                      backgroundColor: "#7944E1",
-                      border: "5px solid #7944E1",
+                      width: CELL_WIDTH,
+                      height: CELL_HEIGHT,
+                      backgroundColor: "#FFD166",
+                      // border: "5px solid #FFD166",
                       position: "absolute",
                       opacity: userCount ? (1 / userCount) * availCount : 0,
                     }}
                   ></div>
                   <div
                     key={i}
-                    onMouseDown={() => {
-                      updateAvailability(scheduleDay.start, i);
-                    }}
-                    onMouseOver={() => {
-                      if (mouseDown) {
-                        updateAvailability(scheduleDay.start, i);
-                      }
-                    }}
                     style={{
-                      width: "80px",
-                      height: "20px",
-                      border: "5px solid transparent",
-                      borderRightColor: selected ? "#6DC266" : "transparent",
-                      borderLeftColor: selected ? "#6DC266" : "transparent",
-                      borderTopColor:
-                        selected && !lastSelected ? "#6DC266" : "transparent",
-                      borderBottomColor:
-                        selected && !nextSelected ? "#6DC266" : "transparent",
+                      width: CELL_WIDTH,
+                      height: CELL_HEIGHT,
                       userSelect: "none",
+                      backgroundColor: selected ? "#06D6A0" : "transparent",
                       position: "absolute",
-                      borderRadius: "3px",
+                      // borderRadius: "3px",
                     }}
                   ></div>
                 </div>
@@ -192,6 +206,7 @@ const CalendarKey = ({ scheduleDay }: { scheduleDay: ScheduleDay }) => {
   return (
     <div>
       <h2>&#x200B;</h2>
+      &#x200B;
       {Array(scheduleDay.parts)
         .fill(0)
         .map((_, i) => {
@@ -200,11 +215,8 @@ const CalendarKey = ({ scheduleDay }: { scheduleDay: ScheduleDay }) => {
               <div
                 style={{
                   width: i % TICK_FREQUENCY === 0 ? "90px" : "10px",
-                  height: "29px",
-                  borderTop:
-                    i % TICK_FREQUENCY === 0
-                      ? "1px solid black"
-                      : "1px solid grey",
+                  height: CELL_HEIGHT,
+                  borderTop: "1px solid grey",
                 }}
               >
                 {i % TICK_FREQUENCY === 0 && (
