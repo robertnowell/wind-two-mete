@@ -32,14 +32,15 @@ export function MeetingView() {
     if (snapshot.exists()) {
       const loadedMeeting: Meeting = snapshot.val();
       setMeeting(loadedMeeting);
-
-      const startValue = loadedMeeting.scheduleDays.reduce<
-        Record<UnixTime, boolean[]>
-      >((prevValue, currentValue) => {
-        prevValue[currentValue.start] = Array(currentValue.parts).fill(false);
-        return prevValue;
-      }, {});
-      setAvailability(startValue);
+      if (Object.keys(availability).length === 0) {
+        const startValue = loadedMeeting.scheduleDays.reduce<
+          Record<UnixTime, boolean[]>
+        >((prevValue, currentValue) => {
+          prevValue[currentValue.start] = Array(currentValue.parts).fill(false);
+          return prevValue;
+        }, {});
+        setAvailability(startValue);
+      }
     }
 
     setLoading(false);
