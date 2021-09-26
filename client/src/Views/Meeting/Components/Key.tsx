@@ -6,7 +6,7 @@ export function Key() {
       <div style={{ display: "flex" }}>
         <ColorBlock color="#06D6A0" /> Your availability
       </div>
-      <div style={{ display: "flex" }}>
+      <div style={{ marginLeft: "5px", display: "flex" }}>
         <ColorBlock color="#FFD166" /> Group availability
       </div>
     </section>

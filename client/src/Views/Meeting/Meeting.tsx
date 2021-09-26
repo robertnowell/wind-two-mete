@@ -4,13 +4,15 @@ import { getDatabase, ref, child, get, set } from "firebase/database";
 import { nanoid } from "nanoid";
 import { add } from "date-fns";
 import { IdentifyModal } from "./IdentifyModal";
-import { Key } from "./Components/Key";
+import { Message } from "../../Components/Message";
 import { Availability } from "./Components/Availability";
 import { Meeting, UserRecord, GoogleEventFormat, UnixTime } from "../../Types";
 
 const USER_NAME_KEY = "USER_NAME_KEY";
 
 export function MeetingView() {
+  const [copiedMessage, setCopiedMessage] = useState(false);
+  const [saveMessage, setSaveMessage] = useState(false);
   const { id } = useParams<{ id: string }>();
   const [modalOpen, setModalOpen] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -135,7 +137,7 @@ export function MeetingView() {
     if (!meeting) {
       return;
     }
-
+    setSaveMessage(true);
     const db = getDatabase();
 
     const user: UserRecord = {
@@ -185,29 +187,37 @@ export function MeetingView() {
       <p>
         Editing availability for <b>{name}</b>
       </p>
-
-      <input ref={urlInputRef} onChange={() => {}} value={url} />
-      <button
-        onClick={() => {
-          navigator.clipboard.writeText(url);
-        }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="white"
-          fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(url);
+            setCopiedMessage(true);
+          }}
+          style={{ padding: "4px" }}
         >
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <rect x="8" y="8" width="12" height="12" rx="2" />
-          <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="white"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <rect x="8" y="8" width="12" height="12" rx="2" />
+            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" />
+          </svg>
+        </button>
+        <input
+          style={{ marginBottom: 0, height: "30px", marginRight: "4px" }}
+          ref={urlInputRef}
+          onChange={() => {}}
+          value={url}
+        />
+      </div>
       <hr style={{ margin: "1em 0" }} />
       {meeting.users && (
         <p>
@@ -217,7 +227,7 @@ export function MeetingView() {
             .join(", ")}
         </p>
       )}
-      <Key />
+
       <Availability
         availability={availability}
         setAvailability={setAvailability}
@@ -225,6 +235,12 @@ export function MeetingView() {
         meeting={meeting}
         submitTimes={submitTimes}
       />
+      <Message
+        message="Copied"
+        open={copiedMessage}
+        setOpen={setCopiedMessage}
+      />
+      <Message message="Saved" open={saveMessage} setOpen={setSaveMessage} />
     </main>
   );
 }

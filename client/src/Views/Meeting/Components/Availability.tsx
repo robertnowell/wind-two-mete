@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Meeting, ScheduleDay, UnixTime } from "../../../Types";
 import { getDate, getDay, sub, add, format } from "date-fns";
+import { Key } from "./Key";
 const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sun"];
 
 const buildAvailabilityDataStructure = (scheduleDays: ScheduleDay[]) => {
@@ -74,6 +75,7 @@ export function Availability({
 
   return (
     <form>
+      <Key />
       <div style={{ display: "flex" }}>
         <CalendarKey scheduleDay={meeting.scheduleDays[0]} />
         {meeting.scheduleDays.map((scheduleDay, i) => (
@@ -164,7 +166,7 @@ const DayColumn = React.memo(
                     updateAvailability(scheduleDay.start, i);
                     setDragStartState(selected);
                   }}
-                  onMouseOver={() => {
+                  onMouseEnter={() => {
                     if (mouseDown) {
                       updateAvailability(scheduleDay.start, i);
                     }
@@ -188,6 +190,7 @@ const DayColumn = React.memo(
                       userSelect: "none",
                       backgroundColor: selected ? "#06D6A0" : "transparent",
                       position: "absolute",
+                      opacity: 0.5,
                       // borderRadius: "3px",
                     }}
                   ></div>

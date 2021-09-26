@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Meeting, GoogleEventFormat } from "../../Types";
+import { Message } from "../../Components/Message";
 declare global {
   interface Window {
     gapi: any;
@@ -24,8 +25,7 @@ export function IdentifyModal({
   setSchedule: (meetings: GoogleEventFormat[]) => void;
   meeting: Meeting;
 }) {
-  const [error, setError] = useState("");
-
+  const [errorOpen, setErrorOpen] = useState(false);
   useEffect(() => {
     const script = document.createElement("script");
     script.async = true;
@@ -37,6 +37,10 @@ export function IdentifyModal({
 
   const syncGoogle = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
+    if (!name) {
+      setErrorOpen(true);
+      return;
+    }
     window.gapi.load("client:auth2", initClient);
   };
 
@@ -111,7 +115,7 @@ export function IdentifyModal({
   const manuallyAdd = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     if (!name) {
-      setError("Please tell us your name :)");
+      setErrorOpen(true);
       return;
     }
     setModalOpen(false);
@@ -147,39 +151,30 @@ export function IdentifyModal({
           }}
         >
           <h1 style={{ textAlign: "center" }}>{meeting.name}</h1>
-          <label style={{ textAlign: "center" }}>
-            Import your availability
-          </label>
-          <button style={{ textAlign: "center" }} onClick={syncGoogle}>
-            Sync your calendar with Google
-          </button>
-          <div
-            style={{
-              height: "0px",
-              left: "412px",
-              top: "478px",
-              width: "800px",
-
-              border: "1px solid #000000",
-            }}
-          ></div>
-          <label style={{ textAlign: "center" }} htmlFor="name">
-            Or
-          </label>
+          <label htmlFor="name">Your Name</label>
           <input
             style={{ marginLeft: "auto", marginRight: "auto" }}
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder={"Tell us what to call you"}
+            placeholder={"Tell us what to call you..."}
           />
-          <button
-            style={{ marginLeft: "auto", marginRight: "auto" }}
-            onClick={manuallyAdd}
-          >
-            Manually add my availability
-          </button>
-          {error}
+          <div>
+            <button style={{ textAlign: "center" }} onClick={syncGoogle}>
+              Sync your calendar with Google
+            </button>
+            <button
+              style={{
+                border: "1px solid grey",
+                color: "white",
+                backgroundColor: "grey",
+                marginLeft: "7px",
+              }}
+              onClick={manuallyAdd}
+            >
+              Manually add my availability
+            </button>
+          </div>
         </form>
       </header>
       <div
@@ -193,6 +188,12 @@ export function IdentifyModal({
           opacity: 0.5,
         }}
       ></div>
+      <Message
+        message="Tell us your name!"
+        open={errorOpen}
+        setOpen={setErrorOpen}
+        errorMessage
+      />
     </div>
   );
 }
